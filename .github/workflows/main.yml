@@ -33,7 +33,7 @@ jobs:
           # -DCMAKE_TOOLCHAIN_FILE=$PWD/ios.toolchain.cmake
           cmake -B build \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CROSSCOMPILING=true \
-            -DCMAKE_SYSTEM_NAME=Darwin \
+            -DCMAKE_SYSTEM_NAME=iOS \
             -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DCMAKE_OSX_SYSROOT="$(xcrun --sdk iphoneos --show-sdk-path)" \
@@ -46,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: libshaderc
-          path: build/libshaderc/libshaderc.dylib
+          path: build/libshaderc/*.dylib
