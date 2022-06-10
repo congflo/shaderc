@@ -34,7 +34,7 @@ jobs:
         run: |
           # wget https://raw.githubusercontent.com/leetal/ios-cmake/master/ios.toolchain.cmake
           ./utils/git-sync-deps
-          cmake -C build $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=RelWithDebInfo -DANDROID_PLATFORM=24 -DANDROID_ABI=${{matrix.arch}} -DCMAKE_TOOLCHAIN_FILE=$ANDROID_SDK_ROOT/ndk-bundle/build/cmake/android.toolchain.cmake
+          cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DANDROID_PLATFORM=24 -DANDROID_ABI=${{matrix.arch}} -DCMAKE_TOOLCHAIN_FILE=$ANDROID_SDK_ROOT/ndk-bundle/build/cmake/android.toolchain.cmake
           cmake --build build --clean-first -- -j8
           # | echo "Build exit code: $?"
           # --verbose
