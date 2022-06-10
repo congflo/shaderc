@@ -32,10 +32,12 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: "Build shaderc for Android ${{matrix.arch}}"
         run: |
-          # wget https://raw.githubusercontent.com/leetal/ios-cmake/master/ios.toolchain.cmake
           ./utils/git-sync-deps
           cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DANDROID_PLATFORM=24 -DANDROID_ABI=${{matrix.arch}} -DCMAKE_TOOLCHAIN_FILE=$ANDROID_SDK_ROOT/ndk-bundle/build/cmake/android.toolchain.cmake
           cmake --build build --clean-first -- -j8
+          cd build/libshaderc
+          cp libshaderc_shared.so libshaderc.so
+          $ANDROID_SDK_ROOT/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip libshaderc.so
           # | echo "Build exit code: $?"
           # --verbose
 
@@ -43,4 +45,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: libshaderc-${{matrix.arch}}
+          path: build/libshaderc/libshaderc.so
+
+      - name: Upload libshaderc (with debug info)
+        uses: actions/upload-artifact@v2
+        with:
+          name: libshaderc-${{matrix.arch}}-debug
           path: build/libshaderc/libshaderc_shared.so
