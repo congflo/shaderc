@@ -28,12 +28,14 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Build shaderc
         run: |
-          wget https://raw.githubusercontent.com/leetal/ios-cmake/master/ios.toolchain.cmake
+          # wget https://raw.githubusercontent.com/leetal/ios-cmake/master/ios.toolchain.cmake
           ./utils/git-sync-deps
-          cmake -B build -DCMAKE_TOOLCHAIN_FILE=$PWD/ios.toolchain.cmake \
+          # -DCMAKE_TOOLCHAIN_FILE=$PWD/ios.toolchain.cmake
+          cmake -B build \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CROSSCOMPILING=true \
             -DCMAKE_SYSTEM_NAME=Darwin \
             -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_OSX_SYSROOT="$(xcrun --sdk iphoneos --show-sdk-path)" \
             -DCMAKE_C_FLAGS="-arch arm64 -miphoneos-version-min=12.0"
           cmake --build build --config RelWithDebInfo -j8
