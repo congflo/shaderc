@@ -31,9 +31,11 @@ jobs:
           # wget https://raw.githubusercontent.com/leetal/ios-cmake/master/ios.toolchain.cmake
           ./utils/git-sync-deps
           # -DCMAKE_TOOLCHAIN_FILE=$PWD/ios.toolchain.cmake
+          # Unable to set CMAKE_SYSTEM_NAME to iOS, doing live patch instead
+          sed -i 's/iOS/Darwin/g' third_party/spirv-tools/tools/CMakeLists.txt
           cmake -B build \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CROSSCOMPILING=true \
-            -DCMAKE_SYSTEM_NAME=iOS \
+            -DCMAKE_SYSTEM_NAME=Darwin \
             -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DCMAKE_OSX_SYSROOT="$(xcrun --sdk iphoneos --show-sdk-path)" \
