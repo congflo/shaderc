@@ -37,5 +37,13 @@ jobs:
             -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
             -DCMAKE_OSX_ARCHITECTURES=arm64 \
             -DCMAKE_OSX_SYSROOT="$(xcrun --sdk iphoneos --show-sdk-path)" \
-            -DCMAKE_C_FLAGS="-arch arm64 -miphoneos-version-min=12.0"
+            -DCMAKE_C_FLAGS="-arch arm64 -miphoneos-version-min=12.0" \
+            -DSHADERC_SKIP_EXAMPLES=ON \
+            -DSHADERC_SKIP_TESTS=ON
           cmake --build build --config RelWithDebInfo -j8
+
+      - name: Upload libshaderc
+        uses: actions/upload-artifact@v2
+        with:
+          name: libshaderc
+          path: build/libshaderc/libshaderc.dylib
