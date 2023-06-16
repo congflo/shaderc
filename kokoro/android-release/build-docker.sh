@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2017-2022 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,33 +14,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# MacOS Build Script.
+# Android Build Script.
+
 
 # Fail on any error.
 set -e
+
+. /bin/using.sh # Declare the bash `using` function for configuring toolchains.
+
 # Display commands being run.
 set -x
 
-BUILD_ROOT=$PWD
-SRC=$PWD/github/shaderc
-BUILD_TYPE=$1
+using cmake-3.17.2
+using ninja-1.10.0
+using ndk-r21d # Sets ANDROID_NDK_HOME, pointing at the NDK's root dir
 
-# Get NINJA.
-wget -q https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-mac.zip
-unzip -q ninja-mac.zip
-chmod +x ninja
-export PATH="$PWD:$PATH"
-
-cd $SRC
+cd $ROOT_DIR
 ./utils/git-sync-deps
 
 mkdir build
-cd $SRC/build
+cd $ROOT_DIR/build
 
 # Invoke the build.
 BUILD_SHA=${KOKORO_GITHUB_COMMIT:-$KOKORO_GITHUB_PULL_REQUEST_COMMIT}
 echo $(date): Starting build...
-cmake -GNinja -DCMAKE_INSTALL_PREFIX=$KOKORO_ARTIFACTS_DIR/install -DRE2_BUILD_TESTING=OFF -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+cmake \
+  -GNinja \
+  -DCMAKE_MAKE_PROGRAM=ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DANDROID_ABI="$TARGET_ARCH" \
+  -DSHADERC_SKIP_TESTS=ON \
+  -DSPIRV_SKIP_TESTS=ON \
+  -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
+  -DANDROID_NDK=$ANDROID_NDK_HOME ..
 
 echo $(date): Build glslang...
 ninja glslangValidator
@@ -52,12 +58,3 @@ echo $(date): Check Shaderc for copyright notices...
 ninja check-copyright
 
 echo $(date): Build completed.
-
-echo $(date): Starting ctest...
-ctest --output-on-failure -j4
-echo $(date): ctest completed.
-
-# Package the build.
-ninja install
-cd $KOKORO_ARTIFACTS_DIR
-tar czf install.tgz install

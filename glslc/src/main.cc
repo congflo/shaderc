@@ -67,13 +67,15 @@ Options:
   -fentry-point=<name>
                     Specify the entry point name for HLSL compilation, for
                     all subsequent source files.  Default is "main".
+  -fhlsl-16bit-types
+                    Enable 16-bit type support for HLSL.
   -fhlsl_functionality1, -fhlsl-functionality1
                     Enable extension SPV_GOOGLE_hlsl_functionality1 for HLSL
                     compilation.
-  -finvert-y        Invert position.Y output in vertex shader.
   -fhlsl-iomap      Use HLSL IO mappings for bindings.
   -fhlsl-offsets    Use HLSL offset rules for packing members of blocks.
                     Affects only GLSL.  HLSL rules are always used for HLSL.
+  -finvert-y        Invert position.Y output in vertex shader.
   -flimit=<settings>
                     Specify resource limits. Each limit is specified by a limit
                     name followed by an integer value.  Tokens should be
@@ -85,6 +87,9 @@ Options:
                     a NaN operand, the other operand is returned. Similarly,
                     the clamp builtin will favour the non-NaN operands, as if
                     clamp were implemented as a composition of max and min.
+  -fpreserve-bindings
+                    Preserve all binding declarations, even if those bindings
+                    are not used.
   -fresource-set-binding [stage] <reg0> <set0> <binding0>
                         [<reg1> <set1> <binding1>...]
                     Explicitly sets the descriptor set and binding for
@@ -322,10 +327,14 @@ int main(int argc, char** argv) {
     } else if (arg == "-fhlsl_functionality1" ||
                arg == "-fhlsl-functionality1") {
       compiler.options().SetHlslFunctionality1(true);
+    } else if (arg == "-fhlsl-16bit-types") {
+      compiler.options().SetHlsl16BitTypes(true);
     } else if (arg == "-finvert-y") {
       compiler.options().SetInvertY(true);
     } else if (arg == "-fnan-clamp") {
       compiler.options().SetNanClamp(true);
+    } else if (arg.starts_with("-fpreserve-bindings")) {
+      compiler.options().SetPreserveBindings(true);
     } else if (((u_kind = shaderc_uniform_kind_image),
                 (arg == "-fimage-binding-base")) ||
                ((u_kind = shaderc_uniform_kind_texture),

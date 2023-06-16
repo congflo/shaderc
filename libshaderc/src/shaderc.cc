@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "shaderc/shaderc.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -529,6 +531,11 @@ void shaderc_compile_options_set_binding_base_for_stage(
                                                GetUniformKind(kind), base);
 }
 
+void shaderc_compile_options_set_preserve_bindings(
+    shaderc_compile_options_t options, bool preserve_bindings) {
+  options->compiler.SetPreserveBindings(preserve_bindings);
+}
+
 void shaderc_compile_options_set_auto_map_locations(
     shaderc_compile_options_t options, bool auto_map) {
   options->compiler.SetAutoMapLocations(auto_map);
@@ -550,6 +557,11 @@ void shaderc_compile_options_set_hlsl_register_set_and_binding(
 void shaderc_compile_options_set_hlsl_functionality1(
     shaderc_compile_options_t options, bool enable) {
   options->compiler.EnableHlslFunctionality1(enable);
+}
+
+void shaderc_compile_options_set_hlsl_16bit_types(
+    shaderc_compile_options_t options, bool enable) {
+  options->compiler.EnableHlsl16BitTypes(enable);
 }
 
 void shaderc_compile_options_set_invert_y(

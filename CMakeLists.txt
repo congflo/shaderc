@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.17.2)
 
-# Enable MSVC Runtime Library Property
-cmake_policy(SET CMP0091 NEW)
+if (POLICY CMP00091)
+  # Enable MSVC Runtime Library Property
+  cmake_policy(SET CMP0091 NEW)
+endif()
 
 project(shaderc)
 enable_testing()
@@ -66,7 +68,7 @@ endif()
 
 option(SHADERC_ENABLE_WERROR_COMPILE "Enable passing -Werror to compiler, if available" ON)
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 17)
 
 include(GNUInstallDirs)
 include(cmake/setup_build.cmake)

@@ -29,6 +29,7 @@
 #include "libshaderc_util/spirv_tools_wrapper.h"
 #include "libshaderc_util/string_piece.h"
 #include "libshaderc_util/version_profile.h"
+#include "spirv-tools/libspirv.hpp"
 
 namespace {
 using shaderc_util::string_piece;
@@ -72,7 +73,8 @@ std::pair<int, string_piece> DecodeLineDirective(string_piece directive) {
 // only valid combinations are used.
 EShMessages GetMessageRules(shaderc_util::Compiler::TargetEnv env,
                             shaderc_util::Compiler::SourceLanguage lang,
-                            bool hlsl_offsets, bool debug_info) {
+                            bool hlsl_offsets, bool hlsl_16bit_types,
+                            bool debug_info) {
   using shaderc_util::Compiler;
   EShMessages result = EShMsgCascadingErrors;
   if (lang == Compiler::SourceLanguage::HLSL) {
@@ -93,6 +95,9 @@ EShMessages GetMessageRules(shaderc_util::Compiler::TargetEnv env,
   }
   if (hlsl_offsets) {
     result = static_cast<EShMessages>(result | EShMsgHlslOffsets);
+  }
+  if (hlsl_16bit_types) {
+    result = static_cast<EShMessages>(result | EShMsgHlslEnable16BitTypes);
   }
   if (debug_info) {
     result = static_cast<EShMessages>(result | EShMsgDebugInfo);
@@ -294,7 +299,7 @@ std::tuple<bool, std::vector<uint32_t>, size_t> Compiler::Compile(
 
   const EShMessages rules =
       GetMessageRules(target_env_, source_language_, hlsl_offsets_,
-                      generate_debug_info_);
+                      hlsl_16bit_types_enabled_, generate_debug_info_);
 
   bool success = shader.parse(&limits_, default_version_, default_profile_,
                               force_version_profile_, kNotForwardCompatible,
@@ -344,9 +349,12 @@ std::tuple<bool, std::vector<uint32_t>, size_t> Compiler::Compile(
                     enabled_opt_passes_.end());
 
   if (!opt_passes.empty()) {
+    spvtools::OptimizerOptions opt_options;
+    opt_options.set_preserve_bindings(preserve_bindings_);
+
     std::string opt_errors;
-    if (!SpirvToolsOptimize(target_env_, target_env_version_,
-                            opt_passes, &spirv, &opt_errors)) {
+    if (!SpirvToolsOptimize(target_env_, target_env_version_, opt_passes,
+                            opt_options, &spirv, &opt_errors)) {
       *error_stream << "shaderc: internal error: compilation succeeded but "
                        "failed to optimize: "
                     << opt_errors << "\n";
@@ -444,6 +452,10 @@ void Compiler::EnableHlslFunctionality1(bool enable) {
   hlsl_functionality1_enabled_ = enable;
 }
 
+void Compiler::EnableHlsl16BitTypes(bool enable) {
+  hlsl_16bit_types_enabled_ = enable;
+}
+
 void Compiler::EnableInvertY(bool enable) { invert_y_enabled_ = enable; }
 
 void Compiler::SetNanClamp(bool enable) { nan_clamp_ = enable; }
@@ -481,7 +493,7 @@ std::tuple<bool, std::string, std::string> Compiler::PreprocessShader(
   const auto rules = static_cast<EShMessages>(
       EShMsgOnlyPreprocessor |
       GetMessageRules(target_env_, source_language_, hlsl_offsets_,
-                      false));
+                      hlsl_16bit_types_enabled_, false));
 
   std::string preprocessed_shader;
   const bool success = shader.preprocess(

@@ -1,7 +1,50 @@
 Revision history for Shaderc
 
-v2022.2-dev 2022-02-03
+v2023.5-dev 2022-05-24
+ - For testing, add a dependency on Abseil's C++ library
+
+v2023.4 2022-05-24
+ - Refresh Glslang, SPIRV-Tools, SPIRV-Headers
+ - Android.mk:
+    - Require NDK 21d or later
+    - Update scripts for generating the shared library, which
+      should fix Windows
+ - glslc and APIs:
+    - Add options to control mesh shading limits
+
+v2023.3 2022-03-17
+ - Shaderc now requires C++17
+ - Drop support for VS 2015
+ - Add glslc option -fpreserve-bindings
+ - Refresh Glslang, SPIRV-Tools
+
+v2023.2 2022-01-18
+ - Update DEPS to pull in SPIRV-Tools bugfix #5049
+
+v2023.1 2022-01-13
+ - General/Build
+   - Removed support for GCC-based code coverage builds
+   - Update minimum CMake to 3.17.2
+ - Fix C++20 compatibility: explicitly construct string_piece when
+   comparing to `char*`
+
+v2022.4 2022-11-30
+ - Update to Glslang 11
+ - Update SPIRV-Tools, SPIRV-Headers dependencies
+ - Add Cmake BUNDLE DESTINATION option for target install
+ - The code coverage build is no longer being tested
+
+v2022.3 2022-10-12
+ - #1264: Implement defaults for SPV_EXT_mesh_shader builtins
+ - Update SPIRV-Tools to v2022.4
+
+v2022.2 2022-08-11
+ - Require CMake 3.14 or later
+ - Support 16bit types in HLSL, via glslc option -fhlsl-16bit-types
+   and associated library API methods. PR #1251
  - Update glslc tests for newer Glslang debug output
+ - Update SPIRV-Tools v2022.3 plus one patch
+ - Update SPIRV-Headers
 
 v2022.1 2022-02-03
  - Update DEPS to include two fixes on top of SPIRV-Tools v2022.1:
