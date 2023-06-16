@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Android build
 
 # Controls when the workflow will run
 on:
@@ -33,11 +33,11 @@ jobs:
       - name: "Build shaderc for Android ${{matrix.arch}}"
         run: |
           ./utils/git-sync-deps
-          cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DANDROID_PLATFORM=24 -DANDROID_ABI=${{matrix.arch}} -DCMAKE_TOOLCHAIN_FILE=$ANDROID_SDK_ROOT/ndk-bundle/build/cmake/android.toolchain.cmake
+          cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DANDROID_PLATFORM=24 -DANDROID_ABI=${{matrix.arch}} -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
           cmake --build build --clean-first -- -j8
           cd build/libshaderc
           cp libshaderc_shared.so libshaderc.so
-          $ANDROID_SDK_ROOT/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip libshaderc.so
+          $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip libshaderc.so
           # | echo "Build exit code: $?"
           # --verbose
 
