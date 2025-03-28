@@ -45,7 +45,7 @@ jobs:
           cmake --build build --config RelWithDebInfo -- -j8
 
       - name: Upload libshaderc
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: libshaderc
           path: build/libshaderc/*.dylib
